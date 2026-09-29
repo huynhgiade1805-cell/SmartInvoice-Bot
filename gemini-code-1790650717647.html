@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ERP CENTER - Danh Sách Đề Xuất Thanh Toán & Kiểm Tra Hóa Đơn Tự Động</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            erp: {
+              header: '#0f172a',
+              navbar: '#1e293b',
+              sidebar: '#1e3a8a',
+              navactive: '#0284c7',
+              bg: '#f1f5f9',
+              card: '#ffffff',
+              border: '#cbd5e1',
+              primary: '#0284c7',
+              primaryHover: '#0369a1',
+              accent: '#2563eb',
+              text: '#334155',
+              darkText: '#0f172a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      color: #334155;
+      background-color: #f8fafc;
+    }
+    input, select, textarea {
+      font-size: 11px !important;
+    }
+    .erp-table th {
+      background-color: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      text-transform: uppercase;
+      border: 1px solid #cbd5e1;
+      padding: 6px 4px;
+      text-align: left;
+      font-size: 10px;
+    }
+    .erp-table td {
+      border: 1px solid #e2e8f0;
+      padding: 6px 4px;
+      vertical-align: top;
+      background-color: #ffffff;
+    }
+    .erp-table tr:nth-child(even) td {
+      background-color: #f8fafc;
+    }
+    .erp-table tr:hover td {
+      background-color: #f0f9ff;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 3px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+    .animate-scan {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #0284c7, #38bdf8, #0284c7, transparent);
+      box-shadow: 0 0 15px #38bdf8;
+      animation: scanning 2s linear infinite;
+    }
+    @keyframes scanning {
+      0% { top: 0%; }
+      50% { top: 98%; }
+      100% { top: 0%; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-700 flex flex-col">
+
+  <!-- TOP HEADER MENU -->
+  <header class="bg-slate-900 text-white flex justify-between items-center px-4 py-1.5 border-b border-slate-800 shadow-sm">
+    <div class="flex items-center space-x-6">
+      <div class="font-bold text-base tracking-wider flex items-center gap-2 text-sky-400">
+        <i class="fa-solid fa-cube text-sky-400"></i> ERP CENTER
+      </div>
+      <nav class="flex items-center space-x-1 font-semibold text-xs">
+        <a href="#" class="px-3 py-1 hover:bg-slate-800 rounded transition">TRANG CHỦ</a>
+        <a href="#" class="px-3 py-1 bg-sky-600 text-white rounded font-bold transition shadow-sm">CÔNG CỤ</a>
+        <a href="#" class="px-3 py-1 hover:bg-slate-800 rounded transition">MUA HÀNG</a>
+      </nav>
+    </div>
+    
+    <div class="flex items-center space-x-3 text-xs">
+      <div class="flex items-center space-x-2 bg-slate-800 px-2.5 py-1 rounded-full border border-slate-700">
+        <div class="w-5 h-5 rounded-full bg-sky-500 text-white flex items-center justify-center text-[10px] font-bold">H</div>
+        <span class="font-medium text-slate-200">HUỲNH GIA ĐỆ</span>
+        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+      </div>
+      <div class="relative">
+        <i class="fa-solid fa-bell text-slate-300 text-sm cursor-pointer hover:text-sky-400"></i>
+        <span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold w-3.5 h-3.5 flex items-center justify-center rounded-full">6</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- BREADCRUMB & MAIN CONTAINER -->
+  <main class="flex-grow p-3 max-w-[1920px] mx-auto w-full">
+    
+    <!-- Breadcrumb -->
+    <div class="text-[11px] text-slate-500 mb-2 flex items-center gap-1 font-medium">
+      <span>Công Cụ</span>
+      <i class="fa-solid fa-angle-right text-[9px] text-slate-400"></i>
+      <span>Đề xuất thanh toán</span>
+      <i class="fa-solid fa-angle-right text-[9px] text-slate-400"></i>
+      <span class="text-sky-700 font-bold">Danh sách đề xuất</span>
+    </div>
+
+    <!-- MAIN CONTROL PANEL -->
+    <div class="bg-white rounded-md border border-slate-300 shadow-sm mb-3">
+      <div class="p-3 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+        <div class="flex items-center gap-3">
+          <h1 class="text-base font-bold text-slate-800 tracking-tight flex items-center gap-2">
+            <i class="fa-solid fa-file-invoice-dollar text-sky-600"></i> Danh sách đề xuất thanh toán
+          </h1>
+          <span class="bg-sky-100 text-sky-800 text-[10px] px-2 py-0.5 rounded font-semibold border border-sky-200">System Active</span>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <!-- OCR Auto Check Trigger -->
+          <button onclick="runAutoScanAll()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded font-semibold text-xs flex items-center gap-1.5 shadow transition-all">
+            <i class="fa-solid fa-robot"></i>
+            <span>Quét Hóa Đơn Tự Động Tất Cả</span>
+          </button>
+          <button class="bg-sky-500 hover:bg-sky-600 text-white px-3 py-1.5 rounded font-medium text-xs flex items-center gap-1 shadow transition-all">
+            <i class="fa-solid fa-plus"></i> Create
+          </button>
+        </div>
+      </div>
+
+      <!-- FILTER SEARCH FORM (Đúng chính xác giao diện ảnh 1) -->
+      <div class="p-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-2 text-xs bg-slate-50/50">
+        <!-- Left Column 1 -->
+        <div class="space-y-1.5">
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Nội dung đề xuất</label>
+            <input type="text" id="filterContent" class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500" placeholder="">
+          </div>
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Số tiền</label>
+            <input type="text" class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500" placeholder="">
+          </div>
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Đề nghị trả cho</label>
+            <input type="text" class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500" placeholder="">
+          </div>
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">ID</label>
+            <input type="text" class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500" placeholder="">
+          </div>
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Công ty</label>
+            <select class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500 bg-white">
+              <option>----</option>
+              <option>Vĩnh Khang .SERVICE</option>
+              <option>Vĩnh Khang .MARKETING</option>
+              <option>Vĩnh Khang .SALES</option>
+              <option>Vĩnh Khang .B.O.D</option>
+            </select>
+          </div>
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Department</label>
+            <select class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500 bg-white">
+              <option>None selected</option>
+            </select>
+          </div>
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Team</label>
+            <select class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500 bg-white">
+              <option>None selected</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Column 2 -->
+        <div class="space-y-1.5">
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Chi phí cho tháng</label>
+            <input type="text" class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500" placeholder="">
+          </div>
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Loại đề xuất</label>
+            <select class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500 bg-white">
+              <option>----</option>
+              <option>Thanh Toán</option>
+              <option>Thanh Toán Tạm Ứng</option>
+            </select>
+          </div>
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Dự án</label>
+            <select class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500 bg-white">
+              <option>----</option>
+            </select>
+          </div>
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Nhóm hạng mục</label>
+            <select class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500 bg-white">
+              <option>----</option>
+            </select>
+          </div>
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Nhóm chi phí</label>
+            <select class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500 bg-white">
+              <option>----</option>
+            </select>
+          </div>
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Trạng thái</label>
+            <select id="filterStatus" class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500 bg-white">
+              <option value="ALL">---- Tất cả ----</option>
+              <option value="WAITING">Chờ CASH ACCOUNTANT duyệt</option>
+              <option value="APPROVED">Đã Duyệt (Hợp lệ)</option>
+              <option value="REJECTED">Từ Chối (Bất hợp lệ)</option>
+            </select>
+          </div>
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Created By</label>
+            <select class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500 bg-white">
+              <option>-- Select --</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Column 3 -->
+        <div class="space-y-1.5">
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Từ ngày</label>
+            <input type="date" class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500">
+          </div>
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Đến ngày</label>
+            <input type="date" class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500">
+          </div>
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Payment Date From</label>
+            <input type="date" class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500">
+          </div>
+          <div class="flex items-center">
+            <label class="w-28 text-slate-600 font-medium">Payment Date To</label>
+            <input type="date" class="flex-grow border border-slate-300 rounded px-2 py-1 focus:outline-none focus:border-sky-500">
+          </div>
+          <div class="flex items-center pt-2">
+            <label class="w-32 text-slate-600 font-medium">Hợp đồng năm</label>
+            <input type="checkbox" class="rounded text-sky-600">
+          </div>
+          <div class="flex items-center">
+            <label class="w-32 text-slate-600 font-medium">Đề xuất của tôi (đã duyệt)</label>
+            <input type="checkbox" class="rounded text-sky-600">
+          </div>
+          <div class="flex items-center">
+            <label class="w-32 text-slate-600 font-medium">View</label>
+            <input type="checkbox" class="rounded text-sky-600">
+          </div>
+        </div>
+
+        <!-- Column 4 Search Button -->
+        <div class="flex flex-col justify-end pb-1">
+          <button onclick="applyFilter()" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-1.5 px-4 rounded shadow-sm text-xs flex items-center justify-center gap-1.5 transition">
+            <i class="fa-solid fa-magnifying-glass"></i> Search
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIÊU CHÍ KIỂM TRA TỰ ĐỘNG BANNER -->
+    <div class="bg-gradient-to-r from-sky-900 via-indigo-900 to-slate-900 text-white p-3 rounded-md mb-3 border border-sky-700 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+      <div class="flex items-center gap-3">
+        <div class="bg-sky-500/20 p-2 rounded-lg border border-sky-400/30 text-sky-300 text-xl">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-xs text-sky-200">QUY TRÌNH QUÉT KIỂM TRA HÓA ĐƠN ĐIỆN TỬ TỰ ĐỘNG (OCR ENGINE)</h3>
+          <p class="text-[10px] text-slate-300">Đề xuất sẽ tự động phê duyệt nếu đạt đủ 3 tiêu chí pháp lý & nghiệp vụ dưới đây:</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-2 text-[10px] w-full md:w-auto">
+        <div class="bg-slate-800/80 px-2.5 py-1.5 rounded border border-slate-700 flex items-center gap-1.5">
+          <span class="w-4 h-4 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold text-[9px]">1</span>
+          <span><b>Pháp lý & CQT:</b> Mẫu số, Ký hiệu, Số HĐ, Mã CQT</span>
+        </div>
+        <div class="bg-slate-800/80 px-2.5 py-1.5 rounded border border-slate-700 flex items-center gap-1.5">
+          <span class="w-4 h-4 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold text-[9px]">2</span>
+          <span><b>Hợp lệ nội dung:</b> Đúng chi tiết bill (Ví dụ: Ăn uống)</span>
+        </div>
+        <div class="bg-slate-800/80 px-2.5 py-1.5 rounded border border-slate-700 flex items-center gap-1.5">
+          <span class="w-4 h-4 rounded-full bg-teal-500 text-white flex items-center justify-center font-bold text-[9px]">3</span>
+          <span><b>Thời điểm:</b> Khớp ngày phát sinh giao dịch</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN TABLE DỮ LIỆU ĐÚNG 100% CẤU TRÚC HÌNH 2 -->
+    <div class="bg-white rounded-md border border-slate-300 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto custom-scrollbar">
+        <table class="w-full erp-table text-left border-collapse" id="proposalTable">
+          <thead>
+            <tr>
+              <th class="w-8 text-center">#</th>
+              <th class="w-16">ID</th>
+              <th class="w-40">CÔNG TY</th>
+              <th class="w-36">LOẠI ĐỀ XUẤT</th>
+              <th class="w-44">NHÓM HẠNG MỤC</th>
+              <th class="w-36">
+                <div class="flex items-center justify-between">
+                  <span>SỐ TIỀN THỰC TẾ</span>
+                  <i class="fa-solid fa-magnifying-glass text-emerald-600 text-[10px] cursor-pointer"></i>
+                </div>
+              </th>
+              <th class="min-w-[280px]">NỘI DUNG ĐỀ XUẤT</th>
+              <th class="w-36">TRẠNG THÁI</th>
+              <th class="w-20">TRẠNG THÁI PR</th>
+              <th class="w-16">GHI CHÚ</th>
+              <th class="w-40">NHỮNG NGƯỜI ĐÃ DUYỆT</th>
+              <th class="w-24">NGÀY THANH TOÁN</th>
+              <th class="w-24 text-center">ACTION</th>
+              <th class="w-6 text-center"><input type="checkbox"></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Dynamic Javascript Insertion -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination / Footer -->
+      <div class="p-2 border-t border-slate-200 bg-slate-50 flex justify-between items-center text-xs text-slate-500">
+        <div>Hiển thị <b>1 - 9</b> trên tổng số <b>9</b> đề xuất thanh toán</div>
+        <div class="flex gap-1">
+          <button class="px-2 py-0.5 border rounded bg-white hover:bg-slate-100 disabled:opacity-50" disabled>Trang trước</button>
+          <button class="px-2.5 py-0.5 border rounded bg-sky-600 text-white font-bold">1</button>
+          <button class="px-2 py-0.5 border rounded bg-white hover:bg-slate-100 disabled:opacity-50" disabled>Trang sau</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL CHECK HÓA ĐƠN OCR (3 TIÊU CHÍ) -->
+  <div id="ocrModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-2xl border border-slate-300 w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden animate-fadeIn">
+      
+      <!-- Modal Header -->
+      <div class="bg-slate-900 text-white px-4 py-2.5 flex justify-between items-center border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-receipt text-sky-400 text-base"></i>
+          <h2 class="font-bold text-sm tracking-wide" id="modalTitle">KIỂM TRA & ĐỐI SOÁT HÓA ĐƠN TỰ ĐỘNG - ĐỀ XUẤT #<span id="modalId">2531766</span></h2>
+        </div>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white text-base"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-4 overflow-y-auto custom-scrollbar flex-grow space-y-4">
+        
+        <!-- Proposal Info Header -->
+        <div class="bg-slate-50 p-3 rounded border border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
+          <div>
+            <span class="text-slate-500">Đơn vị đề xuất:</span>
+            <div class="font-bold text-slate-800" id="modalCompany">Vĩnh Khang .SERVICE - YANG, SHUNQIN</div>
+          </div>
+          <div>
+            <span class="text-slate-500">Loại đề xuất:</span>
+            <div class="font-bold text-slate-800" id="modalType">Thanh Toán (Cash)</div>
+          </div>
+          <div>
+            <span class="text-slate-500">Số tiền số sách đề nghị:</span>
+            <div class="font-bold text-emerald-700 text-sm" id="modalAmount">4,805,000 VNĐ</div>
+          </div>
+          <div class="col-span-3 border-t border-slate-200 pt-1.5 mt-1">
+            <span class="text-slate-500">Nội dung đề xuất:</span>
+            <div class="font-medium text-slate-800" id="modalContent">Thanh toán chi phí mua quà tặng khách NM, Devin về HQ tham gia cuộc họp...</div>
+          </div>
+        </div>
+
+        <!-- Scanning Simulator View -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          
+          <!-- Column 1: Electronic Invoice Document Mockup -->
+          <div class="border border-slate-300 rounded p-3 bg-white shadow-inner relative overflow-hidden">
+            <div id="scanLine" class="animate-scan hidden"></div>
+
+            <div class="text-center border-b pb-2 mb-2">
+              <span class="text-[10px] text-slate-400 block uppercase font-bold">HÓA ĐƠN GIÁ TRỊ GIA TĂNG (VAT INVOICE)</span>
+              <h4 class="font-bold text-sm text-slate-900" id="invName">CÔNG TY TNHH NHÀ HÀNG ÂM THỰC TRUNG HOA</h4>
+              <p class="text-[10px] text-slate-500">Mã số thuế: <span class="font-semibold text-slate-700" id="invTaxCode">0314889921</span></p>
+            </div>
+
+            <!-- Invoice Header Meta -->
+            <div class="grid grid-cols-2 text-[10px] gap-1 bg-slate-50 p-2 rounded border border-slate-200 mb-2">
+              <div>Ký hiệu mẫu số: <b id="invForm">1</b></div>
+              <div>Ký hiệu hóa đơn: <b id="invSerial">C26TBB</b></div>
+              <div>Số hóa đơn: <b class="text-sky-700 font-bold" id="invNo">0004521</b></div>
+              <div>Ngày xuất: <b id="invDate">2026-09-18</b></div>
+              <div class="col-span-2 text-indigo-900">Mã CQT cấp: <b class="font-mono" id="invCqt">00E912384918239A7</b></div>
+            </div>
+
+            <!-- Goods Details -->
+            <div class="mb-2">
+              <div class="text-[10px] font-bold text-slate-700 mb-1 border-b pb-0.5">CHI TIẾT HÀNG HÓA / DỊCH VỤ CỬA HÀNG:</div>
+              <table class="w-full text-[10px] border border-slate-200">
+                <thead class="bg-slate-100">
+                  <tr>
+                    <th class="p-1 border">Tên hàng hóa / Dịch vụ</th>
+                    <th class="p-1 border text-center">ĐVT</th>
+                    <th class="p-1 border text-right">Đơn giá</th>
+                    <th class="p-1 border text-right">Thành tiền</th>
+                  </tr>
+                </thead>
+                <tbody id="invItemsTable">
+                  <!-- Dynamic Items -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="text-[10px] text-right space-y-0.5 border-t pt-1">
+              <div>Cộng tiền hàng: <span class="font-semibold" id="invSubTotal">4,368,182 VNĐ</span></div>
+              <div>Thành tiền VAT (10%): <span class="font-semibold" id="invVat">436,818 VNĐ</span></div>
+              <div class="text-xs font-bold text-sky-900">Tổng cộng thanh toán: <span id="invTotal">4,805,000 VNĐ</span></div>
+            </div>
+
+            <!-- Attached Bill Image Indicator -->
+            <div class="mt-2 pt-2 border-t border-dashed border-slate-300 flex items-center justify-between text-[10px]">
+              <span class="text-slate-500"><i class="fa-solid fa-paperclip"></i> Bill thanh toán/phiếu thu đính kèm:</span>
+              <span class="font-bold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded border" id="attachedBillName">BILL_AN_UONG_0918.PDF</span>
+            </div>
+          </div>
+
+          <!-- Column 2: 3 Criteria Real-Time Validation Results -->
+          <div class="space-y-2.5 flex flex-col justify-between">
+            <div>
+              <h4 class="font-bold text-xs text-slate-800 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-list-check text-sky-600"></i> KẾT QUẢ ĐỐI SOÁT 3 TIÊU CHÍ HỢP LỆ
+              </h4>
+
+              <div class="space-y-2">
+                
+                <!-- CRITERIA 1 -->
+                <div id="crit1Card" class="p-2.5 rounded border transition-all">
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-xs flex items-center gap-1.5">
+                      <span class="w-4 h-4 rounded-full bg-slate-700 text-white flex items-center justify-center text-[9px]">1</span>
+                      Thông tin Pháp lý & Mã Tổng cục Thuế
+                    </span>
+                    <span id="crit1Badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded">ĐANG CHỜ</span>
+                  </div>
+                  <ul class="text-[10px] space-y-0.5 text-slate-600 pl-5 list-disc" id="crit1Details">
+                    <li>Kiểm tra sự tồn tại của Mẫu số, Ký hiệu & Số HĐ.</li>
+                    <li>Xác thực Mã CQT cấp từ Tổng cục Thuế.</li>
+                    <li>Khớp MST Người bán/Người mua.</li>
+                  </ul>
+                </div>
+
+                <!-- CRITERIA 2 -->
+                <div id="crit2Card" class="p-2.5 rounded border transition-all">
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-xs flex items-center gap-1.5">
+                      <span class="w-4 h-4 rounded-full bg-slate-700 text-white flex items-center justify-center text-[9px]">2</span>
+                      Nội dung hàng hóa & Bill thanh toán
+                    </span>
+                    <span id="crit2Badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded">ĐANG CHỜ</span>
+                  </div>
+                  <ul class="text-[10px] space-y-0.5 text-slate-600 pl-5 list-disc" id="crit2Details">
+                    <li>Định dạng dịch vụ (Tiệc ăn uống / Hàng hóa).</li>
+                    <li>Khớp chính xác từng món/mặt hàng trên Bill đính kèm.</li>
+                  </ul>
+                </div>
+
+                <!-- CRITERIA 3 -->
+                <div id="crit3Card" class="p-2.5 rounded border transition-all">
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-xs flex items-center gap-1.5">
+                      <span class="w-4 h-4 rounded-full bg-slate-700 text-white flex items-center justify-center text-[9px]">3</span>
+                      Thời điểm xuất hóa đơn với giao dịch
+                    </span>
+                    <span id="crit3Badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded">ĐANG CHỜ</span>
+                  </div>
+                  <ul class="text-[10px] space-y-0.5 text-slate-600 pl-5 list-disc" id="crit3Details">
+                    <li>So sánh ngày trên HĐ VAT với ngày hoàn thành dịch vụ.</li>
+                  </ul>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Auto Approval Status Result Box -->
+            <div id="finalDecisionBox" class="p-3 rounded border bg-slate-50 border-slate-300 text-center">
+              <div class="text-[10px] text-slate-500 uppercase font-bold">KẾT LUẬN DUYỆT TỰ ĐỘNG</div>
+              <div class="font-bold text-sm text-slate-700 my-0.5" id="finalDecisionText">Sẵn sàng quét kiểm tra</div>
+              <p class="text-[10px] text-slate-500" id="finalDecisionDesc">Nhấp vào nút bên dưới để tiến hành OCR và phê duyệt.</p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="bg-slate-100 px-4 py-2.5 border-t border-slate-200 flex justify-between items-center">
+        <button onclick="closeModal()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded text-xs transition">Đóng</button>
+        <div class="flex gap-2">
+          <button id="btnRunScan" onclick="executeScanSingle()" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded text-xs shadow flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-barcode"></i> Bắt đầu Quét OCR & Phê Duyệt
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // DỮ LIỆU MẪU CHUẨN 100% CẤU TRÚC HÌNH 2 BẠN CUNG CẤP
+    const mockProposals = [
+      {
+        stt: 11,
+        id: "2531766",
+        company: "Vĩnh Khang",
+        dept: ".SERVICE",
+        requester: "YANG, SHUNQIN",
+        reqDate: "2026-09-18",
+        type: "Thanh Toán",
+        paymentMethod: "Cash",
+        category: "CP NHÀ MÁY - CP tiếp khách",
+        amountText: "4,805,000 VNĐ",
+        amountColor: "text-slate-800 font-bold",
+        content: "Jenny TTBH HCM 5: Thanh toán chi phí mua quà tặng khách NM, Devin về HQ tham gia cuộc họp NM 结算 Devin 回中国开会，赠送礼品 给工厂高管费用 (NOTE: chi phí tiếp khách )",
+        status: "WAITING", // WAITING, APPROVED, REJECTED
+        statusLabel: "Chờ CASH ACCOUNTANT duyệt",
+        prStatus: "",
+        note: "",
+        approvers: [
+          { name: "QIN, YUFEI", status: "ok" },
+          { name: "HUỲNH GIA ĐỆ", status: "pending" }
+        ],
+        payDate: "2026-09-29",
+        // Hóa đơn đính kèm tương ứng
+        invoiceData: {
+          seller: "CÔNG TY TNHH THƯƠNG MẠI & DỊCH VỤ ẨM THỰC VIP",
+          taxCode: "0312988123",
+          formSymbol: "1",
+          serialSymbol: "C26TBB",
+          no: "0004521",
+          date: "2026-09-18",
+          cqtCode: "00E912384918239A7",
+          subTotal: "4,368,182 VNĐ",
+          vat: "436,818 VNĐ",
+          total: "4,805,000 VNĐ",
+          attachedBill: "BILL_TIEP_KHÁCH_0918.PDF",
+          items: [
+            { name: "Tiệc ăn uống tiếp khách NM Devin", unit: "Lượt", price: "3,500,000", total: "3,500,000" },
+            { name: "Quà tặng lưu niệm đồ thủ công", unit: "Bộ", price: "868,182", total: "868,182" }
+          ],
+          validation: {
+            c1: true,
+            c1Note: "Ký hiệu C26TBB, Mã CQT: 00E91238... hợp lệ trên hệ thống Thuế.",
+            c2: true,
+            c2Note: "Nội dung hóa đơn trùng khớp 100% với Bill thanh toán dịch vụ tiếp khách đính kèm.",
+            c3: true,
+            c3Note: "Thời điểm xuất hóa đơn (18/09/2026) trùng khớp với ngày phát sinh giao dịch."
+          }
+        }
+      },
+      {
+        stt: 12,
+        id: "2531737",
+        company: "Vĩnh Khang",
+        dept: ".MARKETING",
+        requester: "VÕ HOÀNG CHÂU",
+        reqDate: "2026-09-18",
+        type: "Thanh Toán",
+        paymentMethod: "Money Bank Transfer - Internal",
+        category: "PRODUCT MARKETING - PRODUCTION",
+        amountText: "14,500,000 VNĐ",
+        amountColor: "text-slate-800 font-bold",
+        content: "Chủ TK: Vo Hoang Chau STK: 19039173380016 Ngân hàng Techcombank Thanh toán 01 vé concert BIGBANG cho photographer quay chụp tại concert (NOTE: Payment for 01 BIGBANG concert for photographer to produce shoton & video in concert)",
+        status: "WAITING",
+        statusLabel: "Chờ CASH ACCOUNTANT duyệt",
+        prStatus: "",
+        note: "",
+        approvers: [
+          { name: "NGUYỄN THỊ THÚY AN", status: "ok" },
+          { name: "HUỲNH GIA ĐỆ", status: "pending" },
+          { name: "TRẦN PHẠM THÀNH QUANG", status: "pending" }
+        ],
+        payDate: "2026-09-29",
+        invoiceData: {
+          seller: "CÔNG TY TNHH SỰ KIỆN & VÉ TRỰC TUYẾN",
+          taxCode: "0109988221",
+          formSymbol: "1",
+          serialSymbol: "C26MKT",
+          no: "0008812",
+          date: "2026-09-18",
+          cqtCode: "00A88129481294812",
+          subTotal: "13,181,818 VNĐ",
+          vat: "1,318,182 VNĐ",
+          total: "14,500,000 VNĐ",
+          attachedBill: "BILL_TICKET_CONCERT.PDF",
+          items: [
+            { name: "Vé tham dự Concert BigBang (Media Production)", unit: "Vé", price: "13,181,818", total: "13,181,818" }
+          ],
+          validation: {
+            c1: true,
+            c1Note: "Đã xác thực mã CQT hợp lệ.",
+            c2: true,
+            c2Note: "Nội dung vé quay chụp chụp hình đúng mục đích Media Marketing.",
+            c3: true,
+            c3Note: "Khớp ngày xuất hóa đơn."
+          }
+        }
+      },
+      {
+        stt: 13,
+        id: "2531675",
+        company: "Vĩnh Khang",
+        dept: ".SALES",
+        requester: "SƠN LIÊN PHÁT",
+        reqDate: "2026-09-17",
+        type: "Thanh Toán Tạm Ứng",
+        paymentMethod: "Money Bank Transfer - Internal",
+        category: "",
+        amountText: "Tiền dư trả về 16,000,000 VNĐ",
+        amountColor: "text-red-600 font-bold",
+        content: "206437456 VPBank NGUYEN VAN NAM hoàn trả tiền tạm ứng đi thị trường",
+        status: "WAITING",
+        statusLabel: "Chờ CASH ACCOUNTANT duyệt",
+        prStatus: "",
+        note: "",
+        approvers: [
+          { name: "NGUYỄN VĂN NAM", status: "ok" },
+          { name: "HUỲNH GIA ĐỆ", status: "pending" },
+          { name: "TRẦN PHẠM THÀNH QUANG", status: "pending" }
+        ],
+        payDate: "",
+        invoiceData: {
+          seller: "CÔNG TY KHÁCH SẠN VÀ DỊCH VỤ DU LỊCH",
+          taxCode: "0301122334",
+          formSymbol: "1",
+          serialSymbol: "C26SVR",
+          no: "0001192",
+          date: "2026-09-10",
+          cqtCode: "INVALID_TAX_00000000",
+          subTotal: "14,545,455 VNĐ",
+          vat: "1,454,545 VNĐ",
+          total: "16,000,000 VNĐ",
+          attachedBill: "BILL_LODGING_SAIGON.PDF",
+          items: [
+            { name: "Chi phí lưu trú khách sạn đi thị trường", unit: "Đêm", price: "14,545,455", total: "14,545,455" }
+          ],
+          validation: {
+            c1: false,
+            c1Note: "LỖI: Mã CQT không tồn tại hoặc hóa đơn chưa được cấp mã hợp lệ từ Tổng cục Thuế!",
+            c2: true,
+            c2Note: "Khớp danh mục lưu trú.",
+            c3: true,
+            c3Note: "Khớp mốc thời gian."
+          }
+        }
+      },
+      {
+        stt: 14,
+        id: "2531542",
+        company: "Vĩnh Khang",
+        dept: ".SALES",
+        requester: "LƯƠNG THỊ DIỄM MY",
+        reqDate: "2026-09-16",
+        type: "Thanh Toán",
+        paymentMethod: "Money Bank Transfer - Internal",
+        category: "",
+        amountText: "8,840,000 VNĐ",
+        amountColor: "text-slate-800 font-bold",
+        content: "VAN BA LUYT - TCB - 19008580947010 Chi phí hóa đơn lưu trú khách sạn T09/2026 - Anh Văn Bá Luýt (NOTE: Hoàn trả lại dư tiền công tác phí dư tiền đi thị trường)",
+        status: "WAITING",
+        statusLabel: "Chờ CASH ACCOUNTANT duyệt",
+        prStatus: "",
+        note: "",
+        approvers: [
+          { name: "VĂN BÁ LUÝT", status: "ok" },
+          { name: "HUỲNH GIA ĐỆ", status: "pending" },
+          { name: "TRẦN PHẠM THÀNH QUANG", status: "pending" }
+        ],
+        payDate: "",
+        invoiceData: {
+          seller: "KHÁCH SẠN PALACE SÀI GÒN",
+          taxCode: "0300998811",
+          formSymbol: "1",
+          serialSymbol: "C26KS",
+          no: "0002231",
+          date: "2026-09-15",
+          cqtCode: "00C88192381293812",
+          subTotal: "8,036,364 VNĐ",
+          vat: "803,636 VNĐ",
+          total: "8,840,000 VNĐ",
+          attachedBill: "BILL_VANBALUYT_HOTEL.PDF",
+          items: [
+            { name: "Tiền phòng lưu trú công tác T09/2026", unit: "Phòng", price: "8,036,364", total: "8,036,364" }
+          ],
+          validation: {
+            c1: true,
+            c1Note: "Mã CQT xác thực chính xác.",
+            c2: true,
+            c2Note: "Nội dung lưu trú đúng Bill đính kèm.",
+            c3: true,
+            c3Note: "Khớp thời gian giao dịch."
+          }
+        }
+      },
+      {
+        stt: 15,
+        id: "2531408",
+        company: "Vĩnh Khang",
+        dept: ".MARKETING",
+        requester: "NGUYỄN VĂN VINH",
+        reqDate: "2026-09-15",
+        type: "Thanh Toán",
+        paymentMethod: "Money Bank Transfer - Internal",
+        category: "",
+        amountText: "484,784 VNĐ",
+        amountColor: "text-slate-800 font-bold",
+        content: "Nguyễn Văn Vinh - 19032102020014 - Ngân hàng Kỹ Thương Việt Nam (Techcombank) Complementary foods for Super Users at kickoff date of project Digibaby / Bánh cho Super users tham gia kick off dự án sản phẩm Digibaby",
+        status: "WAITING",
+        statusLabel: "Chờ CASH ACCOUNTANT duyệt",
+        prStatus: "",
+        note: "",
+        approvers: [
+          { name: "XI, ENG", status: "ok" },
+          { name: "HUỲNH GIA ĐỆ", status: "pending" },
+          { name: "TRẦN PHẠM THÀNH QUANG", status: "pending" }
+        ],
+        payDate: "",
+        invoiceData: {
+          seller: "CÔNG TY VĂN PHÒNG PHẨM BẮC HÀ",
+          taxCode: "0319882211",
+          formSymbol: "1",
+          serialSymbol: "C26VPP",
+          no: "0009918",
+          date: "2026-09-15",
+          cqtCode: "00B99812398129381",
+          subTotal: "440,713 VNĐ",
+          vat: "44,071 VNĐ",
+          total: "484,784 VNĐ",
+          attachedBill: "BILL_BANH_KICKOFF.PDF",
+          items: [
+            { name: "Giấy in A4 & Bút dạ quang văn phòng", unit: "Thùng", price: "440,713", total: "440,713" }
+          ],
+          validation: {
+            c1: true,
+            c1Note: "Thông tin hóa đơn hợp lệ.",
+            c2: false,
+            c2Note: "LỖI SAI NỘI DUNG: Đề xuất thanh toán Tiệc bánh Kickoff dự án nhưng Hóa đơn xuất ra lại là 'Giấy in & Bút dạ quang'! Bất hợp lệ so với Bill ăn uống.",
+            c3: true,
+            c3Note: "Thời gian khớp."
+          }
+        }
+      },
+      {
+        stt: 16,
+        id: "2531319",
+        company: "Vĩnh Khang",
+        dept: ".B.O.D",
+        requester: "LÊ HỮU TRỌNG",
+        reqDate: "2026-09-14",
+        type: "Thanh Toán",
+        paymentMethod: "Money Bank Transfer - Internal",
+        category: "",
+        amountText: "27,000,000 VNĐ",
+        amountColor: "text-slate-800 font-bold",
+        content: "LÊ HỮU TRỌNG BIDV 8022812234 THANH TOÁN CHI PHÍ TIẾP KHÁCH VIP THÁNG 9 (3)",
+        status: "WAITING",
+        statusLabel: "Chờ CASH ACCOUNTANT duyệt",
+        prStatus: "",
+        note: "",
+        approvers: [
+          { name: "JIANAN, SUODANG", status: "ok" },
+          { name: "TRẦN PHẠM THÀNH QUANG", status: "pending" }
+        ],
+        payDate: "",
+        invoiceData: {
+          seller: "CÔNG TY CỔ PHẦN ẨM THỰC HOÀNG GIA",
+          taxCode: "0303388221",
+          formSymbol: "1",
+          serialSymbol: "C26VIP",
+          no: "0000182",
+          date: "2026-08-01",
+          cqtCode: "00D88192381928391",
+          subTotal: "24,545,455 VNĐ",
+          vat: "2,454,545 VNĐ",
+          total: "27,000,000 VNĐ",
+          attachedBill: "BILL_TIEP_KHAC_VIP.PDF",
+          items: [
+            { name: "Dịch vụ tiệc tiếp khách VIP tháng 9", unit: "Gói", price: "24,545,455", total: "24,545,455" }
+          ],
+          validation: {
+            c1: true,
+            c1Note: "Mã CQT xác thực hợp lệ.",
+            c2: true,
+            c2Note: "Nội dung khớp với bill dịch vụ.",
+            c3: false,
+            c3Note: "LỖI SAI THỜI ĐIỂM: Đề xuất tiệc tiếp khách Tháng 09/2026 nhưng Hóa đơn lại xuất từ ngày 01/08/2026 (Xuất sai thời điểm phát sinh dịch vụ quá 30 ngày)!"
+          }
+        }
+      },
+      {
+        stt: 17,
+        id: "2531317",
+        company: "Vĩnh Khang",
+        dept: ".B.O.D",
+        requester: "LÊ HỮU TRỌNG",
+        reqDate: "2026-09-14",
+        type: "Thanh Toán",
+        paymentMethod: "Cash",
+        category: "",
+        amountText: "Cty chi thêm 0 VNĐ",
+        amountColor: "text-emerald-700 font-bold",
+        content: "LÊ HỮU TRỌNG THANH TOÁN CHI PHÍ TIẾP KHÁCH VIP THÁNG 9",
+        status: "WAITING",
+        statusLabel: "Chờ CASH ACCOUNTANT duyệt",
+        prStatus: "",
+        note: "",
+        approvers: [
+          { name: "JIANAN, SUODANG", status: "ok" },
+          { name: "HUỲNH GIA ĐỆ", status: "pending" }
+        ],
+        payDate: "2026-09-29",
+        invoiceData: {
+          seller: "NHÀ HÀNG ÂM THỰC SÀI GÒN",
+          taxCode: "0311223388",
+          formSymbol: "1",
+          serialSymbol: "C26NH",
+          no: "0005512",
+          date: "2026-09-14",
+          cqtCode: "00E11223344556677",
+          subTotal: "0 VNĐ",
+          vat: "0 VNĐ",
+          total: "0 VNĐ",
+          attachedBill: "BILL_0VND.PDF",
+          items: [
+            { name: "Chi phí bù quyết toán", unit: "Suất", price: "0", total: "0" }
+          ],
+          validation: {
+            c1: true,
+            c1Note: "Mã CQT hợp lệ.",
+            c2: true,
+            c2Note: "Khớp chi tiết.",
+            c3: true,
+            c3Note: "Khớp ngày."
+          }
+        }
+      },
+      {
+        stt: 18,
+        id: "2531097",
+        company: "Vĩnh Khang",
+        dept: ".MARKETING",
+        requester: "PHAN KIỀU ANH",
+        reqDate: "2026-09-11",
+        type: "Thanh Toán Tạm Ứng",
+        paymentMethod: "Cash",
+        category: "",
+        amountText: "Tiền dư trả về 25,000,000 VNĐ",
+        amountColor: "text-red-600 font-bold",
+        content: "Phan Kiều Anh Thanh toán chi phí media sự kiện ra mắt reno10",
+        status: "WAITING",
+        statusLabel: "Chờ CASH ACCOUNTANT duyệt",
+        prStatus: "",
+        note: "",
+        approvers: [
+          { name: "VÕ THANH TRUNG", status: "ok" },
+          { name: "NGUYỄN THỊ THÚY AN", status: "ok" },
+          { name: "HUỲNH GIA ĐỆ", status: "pending" }
+        ],
+        payDate: "2026-09-29",
+        invoiceData: {
+          seller: "CÔNG TY TNHH TRUYỀN THÔNG SỐ RENO",
+          taxCode: "0108877665",
+          formSymbol: "1",
+          serialSymbol: "C26MEDIA",
+          no: "0003312",
+          date: "2026-09-11",
+          cqtCode: "00F99887766554433",
+          subTotal: "22,727,273 VNĐ",
+          vat: "2,272,727 VNĐ",
+          total: "25,000,000 VNĐ",
+          attachedBill: "BILL_RENO10_MEDIA.PDF",
+          items: [
+            { name: "Gói sản xuất Media chạy sự kiện Reno10", unit: "Gói", price: "22,727,273", total: "22,727,273" }
+          ],
+          validation: {
+            c1: true,
+            c1Note: "Xác thực mã CQT hợp lệ.",
+            c2: true,
+            c2Note: "Nội dung khớp với hợp đồng truyền thông đính kèm.",
+            c3: true,
+            c3Note: "Thời điểm xuất đúng ngày."
+          }
+        }
+      },
+      {
+        stt: 19,
+        id: "2530917",
+        company: "Vĩnh Khang",
+        dept: ".SALES",
+        requester: "DƯƠNG THÀNH TÙNG",
+        reqDate: "2026-09-09",
+        type: "Thanh Toán",
+        paymentMethod: "Cash",
+        category: "",
+        amountText: "0 VNĐ",
+        amountColor: "text-slate-800 font-bold",
+        content: "1 1",
+        status: "WAITING",
+        statusLabel: "Chờ CASH ACCOUNTANT duyệt",
+        prStatus: "",
+        note: "",
+        approvers: [
+          { name: "NGUYỄN VĂN NAM", status: "ok" },
+          { name: "HUỲNH GIA ĐỆ", status: "pending" }
+        ],
+        payDate: "2026-09-29",
+        invoiceData: {
+          seller: "CÔNG TY TNHH THƯƠNG MẠI TÙNG LÂM",
+          taxCode: "0310011223",
+          formSymbol: "1",
+          serialSymbol: "C26TL",
+          no: "0000001",
+          date: "2026-09-09",
+          cqtCode: "00A00000000000001",
+          subTotal: "0 VNĐ",
+          vat: "0 VNĐ",
+          total: "0 VNĐ",
+          attachedBill: "BILL_01.PDF",
+          items: [
+            { name: "Đề xuất kiểm tra hệ thống", unit: "Cái", price: "0", total: "0" }
+          ],
+          validation: {
+            c1: true,
+            c1Note: "Hóa đơn mẫu hợp lệ.",
+            c2: true,
+            c2Note: "Nội dung đạt yêu cầu.",
+            c3: true,
+            c3Note: "Thời điểm hợp lệ."
+          }
+        }
+      }
+    ];
+
+    let currentProposalId = null;
+
+    // RENDER TABLE FUNCTION
+    function renderTable(data = mockProposals) {
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
+
+      data.forEach((item) => {
+        const tr = document.createElement("tr");
+
+        // Status badge format
+        let statusHtml = `<span class="text-slate-600 font-medium">${item.statusLabel}</span>`;
+        if (item.status === 'APPROVED') {
+          statusHtml = `<span class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold text-[10px] border border-emerald-300 flex items-center gap-1 w-fit"><i class="fa-solid fa-circle-check text-emerald-600"></i> ĐÃ DUYỆT THANH TOÁN</span>`;
+        } else if (item.status === 'REJECTED') {
+          statusHtml = `<span class="bg-red-100 text-red-800 px-1.5 py-0.5 rounded font-bold text-[10px] border border-red-300 flex items-center gap-1 w-fit"><i class="fa-solid fa-circle-xmark text-red-600"></i> TỪ CHỐI THANH TOÁN</span>`;
+        }
+
+        // Approvers list formatting exactly as picture 2
+        let approversHtml = item.approvers.map(app => {
+          if (app.status === 'ok') {
+            return `<div class="flex items-center gap-1 text-[10px] text-slate-700"><span class="text-slate-500 font-medium">${app.name}</span> <i class="fa-solid fa-circle-check text-emerald-600 text-[10px]"></i></div>`;
+          } else {
+            return `<div class="flex items-center gap-1 text-[10px] text-slate-400"><span class="text-slate-400">${app.name}</span> <i class="fa-regular fa-circle-question text-slate-300 text-[10px]"></i></div>`;
+          }
+        }).join('');
+
+        tr.innerHTML = `
+          <td class="text-center font-medium text-slate-500">${item.stt}</td>
+          <td class="font-semibold text-slate-800">${item.id}</td>
+          <td>
+            <div class="font-medium text-slate-800">${item.company}</div>
+            <div class="text-[10px] text-sky-700 font-semibold">${item.dept}</div>
+            <div class="text-[10px] text-slate-600 font-bold">${item.requester}</div>
+            <div class="text-[9px] text-slate-400">.${item.reqDate}</div>
+          </td>
+          <td>
+            <div class="font-medium text-slate-800">${item.type}</div>
+            <div class="text-[10px] text-slate-600 flex items-center gap-1">
+              <i class="fa-solid fa-check text-emerald-600 text-[9px]"></i> ${item.paymentMethod}
+            </div>
+          </td>
+          <td class="text-[10px] font-medium text-slate-700">${item.category}</td>
+          <td><span class="${item.amountColor}">${item.amountText}</span></td>
+          <td class="text-[11px] leading-snug font-normal text-slate-800 break-words">${item.content}</td>
+          <td>${statusHtml}</td>
+          <td class="text-center">${item.prStatus}</td>
+          <td>${item.note}</td>
+          <td>${approversHtml}</td>
+          <td>
+            ${item.payDate ? `<input type="date" value="${item.payDate}" class="border border-slate-300 rounded px-1 py-0.5 text-[10px] text-slate-700 bg-slate-50">` : ''}
+          </td>
+          <td class="text-center">
+            <div class="flex flex-col items-center justify-center gap-1 text-[10px]">
+              <button onclick="openOcrModal('${item.id}')" class="text-sky-700 hover:text-sky-900 font-bold flex items-center gap-1 hover:underline">
+                <i class="fa-solid fa-pen-to-square"></i> Cập nhật
+              </button>
+              <button onclick="openOcrModal('${item.id}')" class="text-slate-600 hover:text-slate-900 flex items-center gap-1">
+                <i class="fa-solid fa-play text-[8px]"></i> Chi tiết
+              </button>
+              <i class="fa-solid fa-print text-slate-400 hover:text-slate-600 cursor-pointer text-[11px]" title="In đề xuất"></i>
+            </div>
+          </td>
+          <td class="text-center"><input type="checkbox"></td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // OPEN MODAL WITH PROPOSAL DETAILS
+    function openOcrModal(id) {
+      const item = mockProposals.find(p => p.id === id);
+      if (!item) return;
+
+      currentProposalId = id;
+      const inv = item.invoiceData;
+
+      document.getElementById("modalId").innerText = item.id;
+      document.getElementById("modalCompany").innerText = `${item.company} ${item.dept} - ${item.requester}`;
+      document.getElementById("modalType").innerText = `${item.type} (${item.paymentMethod})`;
+      document.getElementById("modalAmount").innerText = item.amountText;
+      document.getElementById("modalContent").innerText = item.content;
+
+      // Populate Invoice mockup
+      document.getElementById("invName").innerText = inv.seller;
+      document.getElementById("invTaxCode").innerText = inv.taxCode;
+      document.getElementById("invForm").innerText = inv.formSymbol;
+      document.getElementById("invSerial").innerText = inv.serialSymbol;
+      document.getElementById("invNo").innerText = inv.no;
+      document.getElementById("invDate").innerText = inv.date;
+      document.getElementById("invCqt").innerText = inv.cqtCode;
+      document.getElementById("invSubTotal").innerText = inv.subTotal;
+      document.getElementById("invVat").innerText = inv.vat;
+      document.getElementById("invTotal").innerText = inv.total;
+      document.getElementById("attachedBillName").innerText = inv.attachedBill;
+
+      // Fill items
+      const itemsTbody = document.getElementById("invItemsTable");
+      itemsTbody.innerHTML = "";
+      inv.items.forEach(it => {
+        itemsTbody.innerHTML += `
+          <tr>
+            <td class="p-1 border">${it.name}</td>
+            <td class="p-1 border text-center">${it.unit}</td>
+            <td class="p-1 border text-right">${it.price}</td>
+            <td class="p-1 border text-right font-semibold">${it.total}</td>
+          </tr>
+        `;
+      });
+
+      // Reset Criteria status cards
+      resetCriteriaCards();
+
+      // If item was already processed, display result
+      if (item.status === 'APPROVED' || item.status === 'REJECTED') {
+        applyScanResultsUI(inv.validation, item.status);
+      }
+
+      document.getElementById("ocrModal").classList.remove("hidden");
+    }
+
+    function resetCriteriaCards() {
+      const defaultCardClass = "p-2.5 rounded border bg-slate-50 border-slate-200";
+      const defaultBadgeClass = "text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-600";
+
+      ['crit1', 'crit2', 'crit3'].forEach(c => {
+        document.getElementById(c + 'Card').className = defaultCardClass;
+        const badge = document.getElementById(c + 'Badge');
+        badge.className = defaultBadgeClass;
+        badge.innerText = "ĐANG CHỜ";
+      });
+
+      document.getElementById("crit1Details").innerHTML = `
+        <li>Kiểm tra Mẫu số, Ký hiệu & Số HĐ.</li>
+        <li>Xác thực Mã CQT cấp từ Tổng cục Thuế.</li>
+        <li>Khớp MST Người bán/Người mua.</li>
+      `;
+      document.getElementById("crit2Details").innerHTML = `
+        <li>Định dạng dịch vụ (Tiệc ăn uống / Hàng hóa).</li>
+        <li>Khớp chính xác từng món trên Bill đính kèm.</li>
+      `;
+      document.getElementById("crit3Details").innerHTML = `
+        <li>So sánh ngày HĐ VAT với ngày hoàn thành dịch vụ.</li>
+      `;
+
+      document.getElementById("finalDecisionBox").className = "p-3 rounded border bg-slate-50 border-slate-300 text-center";
+      document.getElementById("finalDecisionText").innerText = "Sẵn sàng quét kiểm tra";
+      document.getElementById("finalDecisionText").className = "font-bold text-sm text-slate-700 my-0.5";
+      document.getElementById("finalDecisionDesc").innerText = "Nhấp vào nút bên dưới để tiến hành OCR và phê duyệt.";
+    }
+
+    function closeModal() {
+      document.getElementById("ocrModal").classList.add("hidden");
+    }
+
+    // RUN SCAN FOR CURRENT OPEN MODAL
+    function executeScanSingle() {
+      const scanLine = document.getElementById("scanLine");
+      scanLine.classList.remove("hidden");
+
+      const item = mockProposals.find(p => p.id === currentProposalId);
+      if (!item) return;
+
+      setTimeout(() => {
+        scanLine.classList.add("hidden");
+        const v = item.invoiceData.validation;
+        const isAllValid = v.c1 && v.c2 && v.c3;
+
+        item.status = isAllValid ? 'APPROVED' : 'REJECTED';
+        if (isAllValid) {
+          item.statusLabel = "ĐÃ DUYỆT THANH TOÁN";
+          item.approvers.forEach(a => a.status = 'ok');
+        } else {
+          item.statusLabel = "TỪ CHỐI THANH TOÁN";
+        }
+
+        applyScanResultsUI(v, item.status);
+        renderTable();
+      }, 1200);
+    }
+
+    function applyScanResultsUI(v, status) {
+      // Criteria 1
+      const c1Card = document.getElementById("crit1Card");
+      const c1Badge = document.getElementById("crit1Badge");
+      if (v.c1) {
+        c1Card.className = "p-2.5 rounded border bg-emerald-50 border-emerald-300";
+        c1Badge.className = "text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-200 text-emerald-800";
+        c1Badge.innerText = "PASSED";
+      } else {
+        c1Card.className = "p-2.5 rounded border bg-red-50 border-red-300";
+        c1Badge.className = "text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-200 text-red-800";
+        c1Badge.innerText = "FAILED";
+      }
+      document.getElementById("crit1Details").innerHTML = `<li class="font-medium">${v.c1Note}</li>`;
+
+      // Criteria 2
+      const c2Card = document.getElementById("crit2Card");
+      const c2Badge = document.getElementById("crit2Badge");
+      if (v.c2) {
+        c2Card.className = "p-2.5 rounded border bg-emerald-50 border-emerald-300";
+        c2Badge.className = "text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-200 text-emerald-800";
+        c2Badge.innerText = "PASSED";
+      } else {
+        c2Card.className = "p-2.5 rounded border bg-red-50 border-red-300";
+        c2Badge.className = "text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-200 text-red-800";
+        c2Badge.innerText = "FAILED";
+      }
+      document.getElementById("crit2Details").innerHTML = `<li class="font-medium">${v.c2Note}</li>`;
+
+      // Criteria 3
+      const c3Card = document.getElementById("crit3Card");
+      const c3Badge = document.getElementById("crit3Badge");
+      if (v.c3) {
+        c3Card.className = "p-2.5 rounded border bg-emerald-50 border-emerald-300";
+        c3Badge.className = "text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-200 text-emerald-800";
+        c3Badge.innerText = "PASSED";
+      } else {
+        c3Card.className = "p-2.5 rounded border bg-red-50 border-red-300";
+        c3Badge.className = "text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-200 text-red-800";
+        c3Badge.innerText = "FAILED";
+      }
+      document.getElementById("crit3Details").innerHTML = `<li class="font-medium">${v.c3Note}</li>`;
+
+      // Final decision box
+      const decBox = document.getElementById("finalDecisionBox");
+      const decText = document.getElementById("finalDecisionText");
+      const decDesc = document.getElementById("finalDecisionDesc");
+
+      if (status === 'APPROVED') {
+        decBox.className = "p-3 rounded border bg-emerald-100 border-emerald-400 text-center";
+        decText.innerText = "ĐÃ TỰ ĐỘNG PHÊ DUYỆT THANH TOÁN";
+        decText.className = "font-bold text-sm text-emerald-800 my-0.5";
+        decDesc.innerText = "Hóa đơn hợp lệ cả 3 tiêu chí. Đề xuất đã chuyển sang kế toán chi tiền.";
+      } else {
+        decBox.className = "p-3 rounded border bg-red-100 border-red-400 text-center";
+        decText.innerText = "TỪ CHỐI THANH TOÁN TỰ ĐỘNG";
+        decText.className = "font-bold text-sm text-red-800 my-0.5";
+        decDesc.innerText = "Hóa đơn vi phạm tiêu chí nghiệp vụ/pháp lý. Hệ thống đã trả về phòng ban đề xuất.";
+      }
+    }
+
+    // RUN AUTOMATIC SCAN FOR ALL PROPOSALS
+    function runAutoScanAll() {
+      let countApproved = 0;
+      let countRejected = 0;
+
+      mockProposals.forEach(p => {
+        const v = p.invoiceData.validation;
+        const isValid = v.c1 && v.c2 && v.c3;
+        if (isValid) {
+          p.status = 'APPROVED';
+          p.statusLabel = "ĐÃ DUYỆT THANH TOÁN";
+          p.approvers.forEach(a => a.status = 'ok');
+          countApproved++;
+        } else {
+          p.status = 'REJECTED';
+          p.statusLabel = "TỪ CHỐI THANH TOÁN";
+          countRejected++;
+        }
+      });
+
+      renderTable();
+      alert(`Đã hoàn tất quét kiểm tra tự động OCR cho toàn bộ danh sách!\n\n✅ Đã duyệt thanh toán: ${countApproved} đề xuất hợp lệ.\n❌ Từ chối thanh toán: ${countRejected} đề xuất vi phạm tiêu chí.`);
+    }
+
+    // FILTER LOGIC
+    function applyFilter() {
+      const statusVal = document.getElementById("filterStatus").value;
+      const contentVal = document.getElementById("filterContent").value.toLowerCase().trim();
+
+      const filtered = mockProposals.filter(p => {
+        let matchStatus = true;
+        if (statusVal !== "ALL") {
+          matchStatus = p.status === statusVal;
+        }
+        let matchContent = true;
+        if (contentVal) {
+          matchContent = p.content.toLowerCase().includes(contentVal) || p.id.includes(contentVal) || p.requester.toLowerCase().includes(contentVal);
+        }
+        return matchStatus && matchContent;
+      });
+
+      renderTable(filtered);
+    }
+
+    // INITIAL RENDER
+    document.addEventListener("DOMContentLoaded", () => {
+      renderTable();
+    });
+  </script>
+</body>
+</html>
